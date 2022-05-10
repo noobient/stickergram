@@ -10,21 +10,21 @@ The scripts should be fairly fast, because I've tried to use parallelism whereve
 
 ### Linux
 
-Stickergram is developed on and for **Ubuntu 21.10**. Please note that for certain conversions, **Ubuntu 20.04 LTS is not compatible** due to some libraries being too old to work with certain image formats. I plan to bump the version requirement to 22.04 LTS once available.
+Stickergram is developed on and for **Ubuntu 22.04**. Please note that for certain image conversions, **Ubuntu 20.04 LTS is not compatible** due to some libraries being too old to work with certain image formats.
 
-If you're on something older than 21.10, or if you use another distro, you can try to use Stickergram anyway, it might work for your use case. If not, I recommend using Docker:
+If you're on something older than 22.04, or if you use another distro, you can try to use Stickergram anyway, it might work for your use case. If not, I recommend using Docker:
 
 ```
-docker run -it ubuntu:21.10
+docker run -it ubuntu:22.04
 ```
 
 ### Windows
 
-If you're on Windows, either use Docker, or use **WSL2**, which is perfectly compatible. In fact, **I develop Stickergram on WSL2**. Since WSL2 only provides LTS releases, just install Ubuntu 20.04, then upgrade to 21.10 manually from within WSL2:
+If you're on Windows, either use Docker, or use **WSL2**, which is perfectly compatible. In fact, **I develop Stickergram on WSL2**. If you're on an older release of Ubuntu and don't want to migrate your environment to a new WSL2 instance, you can do an in-place upgrade to 22.04 from within WSL2:
 
 ```
-sudo sed -i.orig 's/focal/impish/g' /etc/apt/sources.list
-sudo sed -i.orig 's/focal/impish/g' /etc/apt/sources.list.d/*
+sudo sed -i.orig 's/focal/jammy/g' /etc/apt/sources.list
+sudo sed -i.orig 's/focal/jammy/g' /etc/apt/sources.list.d/*
 sudo apt update
 sudo apt dist-upgrade
 ```
