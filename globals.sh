@@ -52,7 +52,7 @@ function is_transparent_png ()
 # $1: source PNG file
 # $2: target PNG file
 # $3: size in NxN format
-# $4: if true, pad to precise size (required for video pack icons)
+# $4: if true, pad to precise size (required for pack icons)
 function resize_png ()
 {
     if [ ! -z "${4+x}" ] && [ ${4} = true ]
@@ -94,8 +94,7 @@ function resize_png ()
             ;;
 
         png_pipe)
-            # TODO will we have to pad static icons too?
-            convert "${1}" -resize "${3}" "${2}"
+            convert "${1}" -resize "${3}" ${convert_extra_flags} "${2}"
             echo -en "\e[36m $(basename ${1})\e[0m:\e[32mresized\e[0m "
             ;;
 
