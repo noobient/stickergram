@@ -39,7 +39,7 @@ function check_config ()
 function resize_icon ()
 {
     echo -n "Resizing icon... "
-    resize_png "${resi_dir}/${1}.png" "${icon_dir}/${1}.png" '100x100'
+    resize_png "${resi_dir}/${1}.png" "${icon_dir}/${1}.png" '100x100' true
     echo ""
 }
 
