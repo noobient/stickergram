@@ -46,7 +46,7 @@ function resize_icon ()
 function convert_icon ()
 {
     echo -n "Converting icon... "
-    convert_png "${icon_dir}/${1}.png" "${icon_dir}/${1}.webm"
+    convert_img_webm "${icon_dir}/${1}.png" "${icon_dir}/${1}.webm"
     echo ""
 }
 

@@ -18,20 +18,28 @@ function clear_dir ()
     mkdir -p "${conv_dir}"
 }
 
-function enum_pngs ()
+function enum_imgs ()
 {
-    pngs=("${resi_dir}/"*.png)
+    imgs=("${resi_dir}/"*.webp)
+
+    # only install anim_dump if we actually have webp files
+    if [ ${#imgs[@]} -gt 0 ]
+    then
+        setup_animdump
+    fi
+
+    imgs+=("${resi_dir}/"*.png)
 }
 
-function print_pngs ()
+function print_imgs ()
 {
-    for (( i=0; i<${#pngs[@]} ; i++ ))
+    for (( i=0; i<${#imgs[@]} ; i++ ))
     do
-        echo ${pngs[i]}
+        echo ${imgs[i]}
     done
 }
 
-function convert_pngs ()
+function convert_imgs ()
 {
     batch_size=$(nproc)
     echo "Starting batch conversion on ${batch_size} threads... "
@@ -39,11 +47,11 @@ function convert_pngs ()
     set +e
 
     (
-    for (( i=0; i<${#pngs[@]} ; i++ ))
+    for (( i=0; i<${#imgs[@]} ; i++ ))
     do
         ((j=j%batch_size)); ((j++==0)) && wait
-        png_file=$(basename "${pngs[i]}")
-        convert_png "${pngs[i]}" "${conv_dir}/${png_file%.*}.webm" &
+        img_file=$(basename "${imgs[i]}")
+        convert_img_webm "${imgs[i]}" "${conv_dir}/${img_file%.*}.webm" &
     done
     wait
     )
@@ -53,6 +61,6 @@ function convert_pngs ()
 }
 
 clear_dir
-enum_pngs
-#print_pngs
-convert_pngs
+enum_imgs
+#print_imgs
+convert_imgs

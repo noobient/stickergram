@@ -35,8 +35,14 @@ Since Stickergram operates on images, it needs a few related utilities:
 
 ```
 sudo add-apt-repository ppa:longsleep/golang-backports
-sudo apt install apngasm apngdis imagemagick ffmpeg golang jq
+sudo apt install apngasm apngdis imagemagick ffmpeg golang jq webp
 go get github.com/ericchiang/pup
+```
+
+WebP images need some manual compilation, so for the time being, you'll also need these:
+
+```
+sudo apt install git gcc make autoconf automake libtool libgif-dev libpng-dev
 ```
 
 # Installation

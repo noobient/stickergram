@@ -18,19 +18,20 @@ function clear_dir ()
     mkdir -p "${resi_dir}"
 }
 
-function enum_pngs ()
+function enum_imgs ()
 {
-    pngs=("${orig_dir}/"*.png)
+    imgs=("${orig_dir}/"*.png)
+    imgs+=("${orig_dir}/"*.webp)
 }
 
-function print_pngs ()
+function print_imgs ()
 {
-    for (( i=0; i<${#pngs[@]} ; i++ ))
+    for (( i=0; i<${#imgs[@]} ; i++ ))
     do
-        echo ${pngs[i]}
+        echo ${imgs[i]}
     done
 }
 
 clear_dir
-enum_pngs
-resize_pngs "${resi_dir}" "${pngs[@]}"
+enum_imgs
+resize_pngs "${resi_dir}" "${imgs[@]}"

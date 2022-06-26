@@ -9,6 +9,13 @@ export icon_config="${dist_dir}/icon.conf"
 export page_file="${orig_dir}/page.html"
 export fuzz_cap=20
 
+export tool_dir="${l2t_dir}/tool"
+export webp_dir="${tool_dir}/libwebp"
+export webp_version='1.2.2'
+export PATH="${PATH}:${webp_dir}/examples"
+
+shopt -s nullglob
+
 function get_pack_type ()
 {
     echo $(cat "${page_file}" | pup --plain 'div[data-widget-id=MainSticker] attr{data-preview}' | jq -r '.type')
@@ -33,7 +40,7 @@ function print_pack_name ()
 }
 
 # returns 'apng' for animated, 'png_pipe' for static
-function get_png_type ()
+function get_img_type ()
 {
     echo $(ffprobe -hide_banner -loglevel 0 -print_format json -show_format "${1}" | jq -r '.format.format_name')
 }
@@ -41,7 +48,7 @@ function get_png_type ()
 function print_png_type ()
 {
     echo -n "Determining PNG type... "
-    get_png_type
+    get_img_type
 }
 
 function is_transparent_png ()
@@ -62,7 +69,7 @@ function resize_png ()
         convert_extra_flags=''
     fi
 
-    png_type=$(get_png_type "${1}")
+    png_type=$(get_img_type "${1}")
 
     case ${png_type} in
         apng)
@@ -93,7 +100,7 @@ function resize_png ()
             \rm -rf "${temp_dir}"
             ;;
 
-        png_pipe)
+        png_pipe|webp_pipe)
             convert "${1}" -resize "${3}" ${convert_extra_flags} "${2}"
             echo -en "\e[36m $(basename ${1})\e[0m:\e[32mresized\e[0m "
             ;;
@@ -131,11 +138,44 @@ function resize_pngs ()
     echo -e "\nBatch resize done."
 }
 
-# $1: source PNG file
-# $2: target WEBM file
-function convert_png ()
+function setup_animdump
 {
-    png_type=$(get_png_type "${1}")
+    have_animdump=0
+    which anim_dump && have_animdump=1 || true
+
+    if [ ${have_animdump} -eq 1 ]
+    then
+        return
+    fi
+
+    echo 'Setting up anim_dump...'
+    mkdir -p "${tool_dir}"
+
+    echo 'Obtaining libwebp sources...'
+    git clone --quiet https://github.com/webmproject/libwebp.git "${webp_dir}"
+
+    pushd "${webp_dir}" > /dev/null
+
+    git fetch --all --tags --quiet
+    git checkout --quiet "tags/v${webp_version}"
+
+    echo 'Running libwebp autogen.sh...'
+    BUILD_ANIMDIFF=1 ./autogen.sh > /dev/null
+    echo 'Configuring libwebp...'
+    ./configure --enable-libwebpdecoder --enable-libwebpextras > /dev/null
+    echo 'Building libwebp...'
+    make -j$(nproc) > /dev/null
+
+    popd > /dev/null
+
+    echo 'anim_dump setup done.'
+}
+
+# $1: source PNG or WebP file
+# $2: target WEBM file
+function convert_img_webm ()
+{
+    png_type=$(get_img_type "${1}")
 
     case ${png_type} in
         apng)
@@ -146,6 +186,25 @@ function convert_png ()
 
         png_pipe)
             echo -en "\e[36m $(basename ${1})\e[0m:\e[31mskipping\e[0m "
+            ;;
+
+        webp_pipe)
+            webp_file=$(basename "${1}")
+            target_dir=$(dirname "${2}")
+            temp_dir="${target_dir}/${webp_file}-temp"
+
+            \rm -rf "${temp_dir}"
+            mkdir "${temp_dir}"
+
+            anim_dump -folder "${temp_dir}" "${1}" > /dev/null
+            echo -en "\e[36m${webp_file}\e[0m:\e[35munpacked\e[0m "
+
+            # settled with these numbers after some trial-n-error
+            # might need to adjust them later
+            ffmpeg -framerate 19 -i "${temp_dir}/dump_%04d.png" -b:v 512k "${2}" 2> /dev/null
+            echo -en "\e[36m${webp_file}\e[0m:\e[32mdone\e[0m "
+
+            \rm -rf "${temp_dir}"
             ;;
 
         *)
