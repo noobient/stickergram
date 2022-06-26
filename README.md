@@ -102,7 +102,7 @@ The resulting stickers will be saved under `dist/<sticker_pack_name>/resi`.
 
 ## Animated stickers
 
-These should be transparent animated PNGs, usually downloaded from some other chat app's sticker store. These need to be resized first, then converted to WebM.
+These should be transparent animated PNG or WebP files, usually downloaded from some other chat app's sticker store. These need to be resized first, then converted to WebM.
 
 ```
 ./resize.sh <sticker_pack_name>
