@@ -60,8 +60,8 @@ clear_dir
 
 jpgs=("${orig_dir}/"*.jpg)
 # make sure to only run if files are actually there
-find "${orig_dir}/" -name *.jpg -type f | grep . && convert_jpgs
-find "${orig_dir}/" -name *.png -type f | grep . && cp "${orig_dir}/"*.png "${conv_dir}"
+find "${orig_dir}/" -name '*.jpg' -type f | grep . && convert_jpgs
+find "${orig_dir}/" -name '*.png' -type f | grep . && cp "${orig_dir}/"*.png "${conv_dir}"
 
 pngs=("${conv_dir}/"*.png)
 trim_pngs
